@@ -1,5 +1,7 @@
 import { connectToDB } from '@/utils/database'
 import Category from '@/models/category'
+import { authOptions } from '../auth/[...nextauth]'
+import { getServerSession } from 'next-auth/next'
 
 export const GET = async () => {
   try {
@@ -14,6 +16,11 @@ export const GET = async () => {
 }
 
 export const POST = async (req) => {
+  const session = await getServerSession(req, res, authOptions)
+
+  if (!session) {
+    return new Response('You need to sign in to reach this method!')
+  }
   const { title, author } = await req.json()
 
   try {
