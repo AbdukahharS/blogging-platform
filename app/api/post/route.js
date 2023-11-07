@@ -14,10 +14,27 @@ export const GET = async () => {
 }
 
 export const POST = async (req) => {
-  const { title, author, body, categories, status, seo, slug, scheduledDate } =
-    await req.json()
-
   try {
+    const session = await getServerSession(authOptions)
+
+    if (!session) {
+      return new Response(
+        JSON.stringify({ message: 'You are not logged in.' }),
+        { status: 400 }
+      )
+    }
+
+    const {
+      title,
+      author,
+      body,
+      categories,
+      status,
+      seo,
+      slug,
+      scheduledDate,
+    } = await req.json()
+
     await connectToDB()
 
     const newPost = new Post({ author, title, body, categories, status, seo })
