@@ -27,6 +27,23 @@ export const PUT = async (req, { params }) => {
     const data = await req.json()
     await connectToDB()
 
+    const post = await Post.findOne({ _id: params.id })
+
+    if (!post) {
+      return new Response(
+        JSON.stringify({ message: 'There is no post with this id' }),
+        { status: 400 }
+      )
+    }
+    if (session.user.id != post.author) {
+      return new Response(
+        JSON.stringify({
+          message: 'You are not allowed to update this post',
+        }),
+        { status: 400 }
+      )
+    }
+
     const updatedPost = await Post.findOneAndUpdate({ _id: params.id }, data, {
       new: true,
     })
@@ -56,6 +73,23 @@ export const DELETE = async (req, { params }) => {
     }
 
     await connectToDB()
+
+    const post = await Post.findOne({ _id: params.id })
+
+    if (!post) {
+      return new Response(
+        JSON.stringify({ message: 'There is no post with this id' }),
+        { status: 400 }
+      )
+    }
+    if (session.user.id != post.author) {
+      return new Response(
+        JSON.stringify({
+          message: 'You are not allowed to delete this post',
+        }),
+        { status: 400 }
+      )
+    }
 
     await Post.deleteOne({ _id: params.id })
 
